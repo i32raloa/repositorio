@@ -88,19 +88,62 @@ void mostrarNuevosAsignados(const std::vector<Student>& pendientes, const std::v
         return;
     }
 
-    std::cout << "\n===== Estudiantes asignados automáticamente =====\n";
-    for (const Student& student : todos) {
-        std::string tutorName;
-        for (const Tutor& tutor : tutors) {
-            if (tutor.getId() == student.getIdTutor()) {
-                tutorName = tutor.getNombre() + " " + tutor.getApellido();
-                break;
+    std::cout << "\n===== ESTUDIANTES ASIGNADOS AUTOMÁTICAMENTE =====\n";
+    for(const Student& pendiente: pendientes) {
+        for(const Student& actual: todos) {
+            if(pendiente.getId() == actual.getId()) {
+
+                std::string tutorName = "Sin asignar";
+                for(const auto& tutor : tutors){
+                    if(tutor.getId() == actual.getIdTutor()){
+                        tutorName = tutor.getNombre() + " " + tutor.getApellido();
+                        break;
+                    }
+                }
+                std::cout << "Estudiante: " << actual.getNombre() << " " << actual.getApellido() << "->tutor: " << tutorName << "\n";
             }
         }
-        std::cout << "Estudiante: " << student.getNombre() << " " << student.getApellido()
-                  << " -> Tutor: " << tutorName << "\n";
     }
     std::cout << "==============================================\n";
+}
+
+void AsignacionManual(std::vector<Student>& students, const std::vector<Tutor> tutors){
+    std::cout << "\n===== ASIGNACIÓN MANUAL DE TUTORES =====\n\n";
+
+    std::cout << "Lista de estudiantes:\n";
+    for(size_t i = 0; i < students.size(); i++){
+        std::cout << i + 1 << ". " << students[i].getNombre() << " " << students[i].getApellido();
+        if(students[i].getIdTutor() == "0"){
+            std::cout << "   (Pendiente de asignar tutor)\n";
+        }
+        else{
+            std::cout << "   (Tutor actual: " << students[i].getIdTutor() << ")\n";
+        }
+    }
+
+    std::cout << "Seleccione el número del estudiante al que desea asignar un tutor\n";
+    size_t studentIndex;
+    std::cin >> studentIndex;
+    if(studentIndex < 1 || studentIndex > students.size()){
+        std::cout << "Índice de estudiante inválido.\n";
+        return;
+    }
+
+    std::cout << "Lista de tutores:\n";
+    for(size_t j = 0; j < tutors.size(); j++){
+        std::cout << j + 1 << ". " << tutors[j].getNombre() << " " << tutors[j].getApellido() << "\n";
+    }
+    std::cout << "Seleccione el número del tutor que desea asignar:\n";
+    size_t tutorIndex;
+    std::cin >> tutorIndex;
+    if(tutorIndex < 1 || tutorIndex > tutors.size()){
+        std::cout << "Índice de tutor inválido.\n";
+        return;
+    }
+
+    students[studentIndex - 1].setIdTutor(tutors[tutorIndex - 1].getId());
+    std::cout << "Tutor asignado exitosamente.\n";
+
 }
 
 
@@ -132,7 +175,8 @@ int main() {
         std::cout << "\n================================ MENÚ PRINCIPAL ================================\n\n\n\n";
         std::cout << "\t\t         1. Mostrar estudiantes y tutores\n\n";
         std::cout << "\t\t        2. Asignar tutores automáticamente\n\n";
-        std::cout << "\t\t\t      3. Salir del programa\n\n\n";
+        std::cout << "\t\t        3. Asignar tutor manualmente\n\n";
+        std::cout << "\t\t\t      4. Salir del programa\n\n\n";
         std::cout << "Seleccione una opción: ";
         std::cin >> opcion;
 
@@ -156,13 +200,19 @@ int main() {
 
                 mostrarNuevosAsignados(pendientes, students, tutors);
                 break;
+
             case 3:
+                AsignacionManual(students, tutors);
+                writeStudentsCSV("students.csv", students);
+                break;
+
+            case 4:
                 std::cout << "Saliendo del programa...\n";
                 break;
             default:
                 std::cout << "Opción no válida, intente nuevamente.\n";
         }
-    } while(opcion != 3);
+    } while(opcion != 4);
 
     return 0;
 }
