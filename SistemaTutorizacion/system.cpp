@@ -65,20 +65,43 @@ void writeStudentsCSV(const std::string& filename, const std::vector<Student>& s
     file.close();
 }
 
-void mostrarAsignaciones(const std::vector<Student>& students, const std::vector<Tutor>& tutors) {
-    std::cout << "\n===== Asignaciones de Tutores =====\n";
-    for(const auto& student : students){
-        std::string tutorName = "Sin asignar";
-        for(const auto& tutor : tutors){
-            if(tutor.getId() == student.getIdTutor()){
-                tutorName = tutor.getNombre() + " " + tutor.getApellido();
+void mostrarAsignaciones(const std::vector<Student>& students,
+                         const std::vector<Tutor>& tutors) {
+
+    std::cout << "\n==================== ASIGNACIONES DE TUTORES ====================\n";
+
+    for (const auto& student : students) {
+
+        const Tutor* tutorAsignado = nullptr;
+
+        for (const auto& tutor : tutors) {
+            if (tutor.getId() == student.getIdTutor()) {
+                tutorAsignado = &tutor;
                 break;
             }
         }
-        std::cout << "Estudiante: " << student.getNombre() << " " << student.getApellido()
-        << " -> Tutor: " << tutorName << "\n";
+
+        std::cout << "\nEstudiante:\n";
+        std::cout << "  ID      : " << student.getId() << "\n";
+        std::cout << "  Nombre  : " << student.getNombre()
+                  << " " << student.getApellido() << "\n";
+        std::cout << "  Carrera : " << student.getCarrera() << "\n\n";
+
+        std::cout << "Tutor:\n";
+
+        if (tutorAsignado) {
+            std::cout << "  ID      : " << tutorAsignado->getId() << "\n";
+            std::cout << "  Nombre  : " << tutorAsignado->getNombre()
+                      << " " << tutorAsignado->getApellido() << "\n";
+            std::cout << "  Área    : " << tutorAsignado->getArea() << "\n";
+        } else {
+            std::cout << "  Estado  : Sin asignar\n";
+        }
+
+        std::cout << "---------------------------------------------------------------\n";
     }
-    std::cout << "===================================\n";
+
+    std::cout << "=================================================================\n";
 }
 
 void mostrarNuevosAsignados(const std::vector<Student>& pendientes, const std::vector<Student>& todos, const std::vector<Tutor>& tutors) {
@@ -120,32 +143,32 @@ void AsignacionManual(std::vector<Student>& students, const std::vector<Tutor> t
         }
     }
 
-    std::cout << "Seleccione el número del estudiante al que desea asignar un tutor\n";
+    std::cout << "\nSeleccione el número del estudiante al que desea asignar un tutor\n\n";
     size_t studentIndex;
     std::cin >> studentIndex;
     if(studentIndex < 1 || studentIndex > students.size()){
-        std::cout << "Índice de estudiante inválido.\n";
+        std::cout << "\nÍndice de estudiante inválido.\n";
         return;
     }
 
-    std::cout << "Lista de tutores:\n";
+    std::cout << "\n\nLista de tutores:\n";
     for(size_t j = 0; j < tutors.size(); j++){
         std::cout << j + 1 << ". " << tutors[j].getNombre() << " " << tutors[j].getApellido() << "\n";
     }
-    std::cout << "Seleccione el número del tutor que desea asignar:\n";
+    std::cout << "\nSeleccione el número del tutor que desea asignar:\n\n";
     size_t tutorIndex;
     std::cin >> tutorIndex;
     if(tutorIndex < 1 || tutorIndex > tutors.size()){
-        std::cout << "Índice de tutor inválido.\n";
+        std::cout << "\nÍndice de tutor inválido.\n";
         return;
     }
 
     students[studentIndex - 1].setIdTutor(tutors[tutorIndex - 1].getId());
-    std::cout << "Tutor asignado exitosamente.\n";
+    std::cout << "\n\nTutor asignado exitosamente.\n";
 
 }
 
-void iniciarChat(const std::string& miId) {
+void iniciarChat(const std::string& miId,const std::vector<Student>& students, const std::vector<Tutor>& tutors) {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         perror("Error creando socket");
@@ -165,10 +188,24 @@ void iniciarChat(const std::string& miId) {
 
     send(sock, miId.c_str(), miId.size(), 0);
 
-    std::string idDest;
-    std::cout << "\nID del tutor/estudiante con el que quieres chatear: ";
-    std::cin >> idDest;
+    if(!mostrarChatsDisponibles(miId, students, tutors)) {
+        std::cout << "\nNo hay chats disponibles para iniciar.\n";
+        close(sock);
+        return;
+    }
+
+    int numeroDest;
+    std::cout << "\nSeleccione el número del tutor/estudiante con el que quieres chatear: ";
+    std::cin >> numeroDest;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    std::string idDest = formatearIdDestino(numeroDest, students, tutors, miId);
+    if(idDest.empty()) {
+        std::cout << "Número inválido, saliendo del chat.\n";
+        close(sock);
+        return;
+    }
+
 
     std::thread receptor([&]() {
         char buffer[1024];
@@ -196,4 +233,139 @@ void iniciarChat(const std::string& miId) {
 
     close(sock);
     receptor.detach();
+}
+
+
+std::string seleccionarTutor(const std::vector<Tutor>& tutors) {
+    std::cout << "\n===== TUTORES =====\n";
+    for (size_t i = 0; i < tutors.size(); ++i) {
+        std::cout << i + 1 << ". "
+                  << tutors[i].getNombre() << " "
+                  << tutors[i].getApellido()
+                  << " (ID " << tutors[i].getId() << ")\n";
+    }
+
+    int opcion;
+    std::cout << "Seleccione su tutor: ";
+    std::cin >> opcion;
+
+    if (opcion < 1 || opcion > (int)tutors.size()) {
+        throw std::runtime_error("Selección inválida");
+    }
+
+    return tutors[opcion - 1].getId();
+}
+
+
+
+std::string seleccionarEstudiante(const std::vector<Student>& students) {
+    std::cout << "\n===== ESTUDIANTES =====\n";
+    for (size_t i = 0; i < students.size(); ++i) {
+        std::cout << i + 1 << ". "
+                  << students[i].getNombre() << " "
+                  << students[i].getApellido()
+                  << " (ID " << students[i].getId() << ")\n";
+    }
+
+    int opcion;
+    std::cout << "Seleccione su estudiante: ";
+    std::cin >> opcion;
+
+    if (opcion < 1 || opcion > (int)students.size()) {
+        throw std::runtime_error("Selección inválida");
+    }
+
+    return students[opcion - 1].getId();
+}
+
+
+
+std::string obtenerTutorDelEstudiante(const std::string& idEstudiante, const std::vector<Student>& students) {
+
+    for (const auto& s : students) {
+        if (s.getId() == idEstudiante) {
+            return s.getIdTutor(); // puede ser "0"
+        }
+    }
+    return "0";
+}
+
+
+std::vector<std::string> obtenerEstudiantesDelTutor(const std::string& idTutor, const std::vector<Student>& students) {
+
+    std::vector<std::string> resultado;
+
+    for (const auto& s : students) {
+        if (s.getIdTutor() == idTutor) {
+            resultado.push_back(s.getId());
+        }
+    }
+    return resultado;
+}
+
+
+bool mostrarChatsDisponibles(const std::string& miId, const std::vector<Student>& students, const std::vector<Tutor>& tutors) {
+
+    bool esTutor = false;
+
+    for (const auto& t : tutors) {
+        if (t.getId() == miId) {
+            esTutor = true;
+            break;
+        }
+    }
+
+    std::cout << "\n================= CHATS DISPONIBLES =================\n";
+
+    if (esTutor) {
+        std::cout << "Rol: Tutor\n";
+        std::cout << "Estudiantes tutorizados:\n";
+
+        auto lista = obtenerEstudiantesDelTutor(miId, students);
+
+        if (lista.empty()) {
+            std::cout << "  (No tienes estudiantes asignados)\n";
+            return false;
+        } else {
+            for (const auto& id : lista) {
+                std::cout << "  - Estudiante ID: " << id << "\n";
+            }
+            return true;
+        }
+    } else {
+        std::cout << "Rol: Estudiante\n";
+        std::string idTutor = obtenerTutorDelEstudiante(miId, students);
+
+        if (idTutor == "0") {
+            std::cout << "  (No tienes tutor asignado)\n";
+            return false;
+        } else {
+            std::cout << "  Tutor asignado: ID " << idTutor << "\n";
+        }
+        return true;
+    }
+
+    std::cout << "====================================================\n";
+}
+
+
+std::string formatearIdDestino(int numero, const std::vector<Student>& students, const std::vector<Tutor>& tutors, const std::string& miId) {
+
+    if(miId[0] == 'S') {
+        if(numero >= 1 && numero <= (int)tutors.size()) {
+            return tutors[numero-1].getId(); 
+        }
+    }
+
+    else if(miId[0] == 'T') {
+
+        std::vector<Student> tutorizados;
+        for(const auto& s : students) {
+            if(s.getIdTutor() == miId) tutorizados.push_back(s);
+        }
+        if(numero >= 1 && numero <= (int)tutorizados.size()) {
+            return tutorizados[numero-1].getId();
+        }
+    }
+    return "";
 }
