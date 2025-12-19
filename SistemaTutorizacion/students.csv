@@ -1,10 +1,10 @@
-S001,Lucia,Gomez,Ingeniería Informática,Ciencias,Español;Inglés,0
-S002,Carlos,Pérez,Matemáticas,Ciencias,Español;Francés,0
-S003,Ana,Ruiz,Física,Ciencias,Inglés;Alemán,0
-S004,Juan,López,Psicología,HUMANIDADES,Español,0
-S005,María,Fernández,Letras,HUMANIDADES,Español;Inglés,0
-S006,Pedro,García,Ingeniería Informática,Ciencias,Español;Chino,0
-S007,Elena,Sánchez,Matemáticas,Ciencias,Inglés;Francés,0
-S008,Diego,Moreno,Física,Ciencias,Español;Inglés,0
-S009,Sofía,Jiménez,Psicología,HUMANIDADES,Español;Alemán,0
-S010,Luis,Hernández,Letras,HUMANIDADES,Francés;Inglés,0
+S001,Lucia,Gomez,Sistemas computacionales,Politécnica Superior,Español;Inglés,0
+S002,Carlos,Pérez,Física Matemática,Politécnica Superior,Español;Francés,0
+S003,Ana,Ruiz,Química,Politécnica Superior,Inglés;Alemán,0
+S004,Juan,López,Psicología,Facultad de Filosofía y Letras,Español,0
+S005,María,Fernández,Historia,Facultad de Filosofía y Letras,Español;Inglés,0
+S006,Pedro,García,Ingeniería Informática,Politécnica Superior,Español;Chino,0
+S007,Elena,Sánchez,Estadística,Politécnica Superior,Inglés;Francés,0
+S008,Diego,Moreno,Astrofísica,Politécnica Superior,Español;Inglés,0
+S009,Sofía,Jiménez,Trabajo social,Facultad de Filosofía y Letras,Español;Alemán,0
+S010,Luis,Hernández,Filosofía,Facultad de Filosofía y Letras,Francés;Inglés,0
