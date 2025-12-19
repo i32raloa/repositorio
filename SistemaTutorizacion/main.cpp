@@ -24,61 +24,114 @@ int main() {
     }
 
     int opcion = 0;
+    int rol=0;
     AutoAssigner assigner;
 
-    do {
-        std::cout << "\n\n\n";
-        std::cout << "\n================================ MENÚ PRINCIPAL ================================\n\n\n\n";
-        std::cout << "\t\t         1. Mostrar estudiantes y tutores\n\n";
-        std::cout << "\t\t        2. Asignar tutores automáticamente\n\n";
-        std::cout << "\t\t        3. Asignar tutor manualmente\n\n";
-        std::cout << "\t\t        4. Enviar mensajes \n\n";
-        std::cout << "\t\t\t      5. Salir del programa\n\n\n";
-        std::cout << "Seleccione una opción: ";
-        std::cin >> opcion;
+    system("clear");
+    
+    std::cout << "Roles : \n 1. Administrador\n 2. Tutor\n 3. Estudiante\n";
+    std::cin >> rol;
+
+    system("clear");
+
+    if(rol ==1){
+
+        do {
+            std::cout << "\n\n\n";
+            std::cout << "\n================================ MENÚ PRINCIPAL ================================\n\n\n\n";
+            std::cout << "\t\t         1. Mostrar estudiantes y tutores\n\n";
+            std::cout << "\t\t        2. Asignar tutores automáticamente\n\n";
+            std::cout << "\t\t        3. Asignar tutor manualmente\n\n";
+            std::cout << "\t\t\t      4. Salir del programa\n\n\n";
+            std::cout << "Seleccione una opción: ";
+            std::cin >> opcion;
 
 
 
 
-        std::vector<Student> pendientes;
+            std::vector<Student> pendientes;
 
-        switch(opcion) {
-            case 1:
-                mostrarAsignaciones(students, tutors);
-                
-                break;
-            case 2:
-                for (const Student& s : students) {
-                    if (s.getIdTutor()=="0") pendientes.push_back(s);
-                }
+            switch(opcion) {
+                case 1:
+                    mostrarAsignaciones(students, tutors);
+                    std::cout << "\n\nPresione Enter para continuar...";
+                    std::cin.get();
+                    std::cin.get();
+                    system("clear");
+                    
+                    break;
+                case 2:
+                    for (const Student& s : students) {
+                        if (s.getIdTutor()=="0") pendientes.push_back(s);
+                    }
 
-                assigner.assignTutors(students, tutors, areaMap);
-                writeStudentsCSV("students.csv", students);
+                    assigner.assignTutors(students, tutors, areaMap);
+                    writeStudentsCSV("students.csv", students);
 
-                mostrarNuevosAsignados(pendientes, students, tutors);
-                break;
+                    mostrarNuevosAsignados(pendientes, students, tutors);
 
-            case 3:
-                AsignacionManual(students, tutors);
-                writeStudentsCSV("students.csv", students);
-                break;
+                    std::cout << "\n\nPresione Enter para continuar...";
+                    std::cin.get();
+                    std::cin.get();
+                    system("clear");
+                    break;
 
-            case 4:
-                {
-                    std::string miId;
-                    std::cout << "Ingrese su ID (tutor o estudiante): ";
-                    std::cin >> miId;
-                    iniciarChat(miId);
-                }
-                break;
+                case 3:
+                    AsignacionManual(students, tutors);
+                    writeStudentsCSV("students.csv", students);
 
-            case 5:
-                std::cout << "Saliendo del programa...\n";
-                break;
-            default:
-                std::cout << "Opción no válida, intente nuevamente.\n";
+                    std::cout << "\n\nPresione Enter para continuar...";
+                    std::cin.get();
+                    std::cin.get();
+                    system("clear");
+                    break;
+
+                case 4:
+                    std::cout << "Saliendo del programa...\n";
+                    break;
+                default:
+                    std::cout << "Opción no válida, intente nuevamente.\n";
+            }
+        } while(opcion != 4);
+
+    }
+
+    else if (rol ==2 || rol ==3){
+        std::string miId;
+        if(rol == 2){
+            miId = seleccionarTutor(tutors);
         }
-    } while(opcion != 4);
+        else{
+            miId = seleccionarEstudiante(students);
+        }
+        
+        do{
+            std::cout << "\n\n\n";
+            std::cout << "\n================================ MENÚ PRINCIPAL ================================\n\n\n\n";
+            std::cout << "\t\t        1. Enviar mensajes \n\n";
+            std::cout << "\t\t\t      2. Salir del programa\n\n\n";
+            std::cout << "Seleccione una opción: ";
+            std::cin >> opcion;
+
+            switch(opcion){
+                case 1:
+                    iniciarChat(miId, students, tutors);
+                    break;
+                case 2:
+                    std::cout << "Saliendo del programa...\n";
+                    break;
+                default:
+                    std::cout << "Opción no válida, intente nuevamente.\n";
+            }
+
+        } while (opcion !=2);
+    }
+
+
+
+    else {
+        std::cout << "Opción no válida, saliendo del programa.\n";
+    }
 
     return 0;
 }
