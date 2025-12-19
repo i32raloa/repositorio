@@ -9,15 +9,22 @@ set(SOURCES
     student.cpp
     tutor.cpp
     AutoAssigner.cpp
+    system.cpp
 )
 
-add_executable(Programa ${SOURCES})
+add_executable(programa ${SOURCES})
+
+
+add_executable(chat_server
+    chat_server.cpp
+)
 
 set(CSV_FILES
     students.csv
     tutors.csv
     area.csv
 )
+
 
 foreach(csv ${CSV_FILES})
 configure_file(${csv} ${csv} COPYONLY)
