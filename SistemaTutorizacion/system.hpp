@@ -13,6 +13,12 @@ void writeStudentsCSV(const std::string& filename, const std::vector<Student>& s
 void mostrarAsignaciones(const std::vector<Student>& students, const std::vector<Tutor>& tutors);
 void mostrarNuevosAsignados(const std::vector<Student>& pendientes, const std::vector<Student>& todos, const std::vector<Tutor>& tutors);
 void AsignacionManual(std::vector<Student>& students, const std::vector<Tutor> tutors);
-void iniciarChat(const std::string& miId);
+void iniciarChat(const std::string& miId,const std::vector<Student>& students, const std::vector<Tutor>& tutors);
+std::string seleccionarEstudiante(const std::vector<Student>& students);
+std::string seleccionarTutor(const std::vector<Tutor>& tutors);
+std::string obtenerTutorDelEstudiante(const std::string& idEstudiante, const std::vector<Student>& students);
+std::vector<std::string> obtenerEstudiantesDelTutor(const std::string& idTutor, const std::vector<Student>& students);
+bool mostrarChatsDisponibles(const std::string& miId, const std::vector<Student>& students, const std::vector<Tutor>& tutors); 
+std::string formatearIdDestino(int numero, const std::vector<Student>& students, const std::vector<Tutor>& tutors, const std::string& miId);
 
 #endif
