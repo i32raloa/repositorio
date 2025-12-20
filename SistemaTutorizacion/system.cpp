@@ -218,7 +218,7 @@ void iniciarChat(const std::string& miId,const std::vector<Student>& students, c
         }
     });
 
-    std::cout << "\nPulse intro para conversar y control+c para salir del chat.\n> ";
+    std::cout << "\nPulse intro para conversar y escriba SALIR para salir del chat.\n> ";
 
     while (true) {
         std::string mensaje;
