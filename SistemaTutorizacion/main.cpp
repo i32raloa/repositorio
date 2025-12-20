@@ -41,7 +41,7 @@ int main() {
             std::cout << "\n================================ MENÚ PRINCIPAL ================================\n\n\n\n";
             std::cout << "\t\t         1. Mostrar estudiantes y tutores\n\n";
             std::cout << "\t\t        2. Asignar tutores automáticamente\n\n";
-            std::cout << "\t\t        3. Asignar tutor manualmente\n\n";
+            std::cout << "\t\t           3. Asignar tutor manualmente\n\n";
             std::cout << "\t\t\t      4. Salir del programa\n\n\n";
             std::cout << "Seleccione una opción: ";
             std::cin >> opcion;
@@ -104,11 +104,11 @@ int main() {
         else{
             miId = seleccionarEstudiante(students);
         }
-        
+        system("clear");
         do{
             std::cout << "\n\n\n";
             std::cout << "\n================================ MENÚ PRINCIPAL ================================\n\n\n\n";
-            std::cout << "\t\t        1. Enviar mensajes \n\n";
+            std::cout << "\t\t               1. Enviar mensajes \n\n";
             std::cout << "\t\t\t      2. Salir del programa\n\n\n";
             std::cout << "Seleccione una opción: ";
             std::cin >> opcion;
@@ -116,6 +116,9 @@ int main() {
             switch(opcion){
                 case 1:
                     iniciarChat(miId, students, tutors);
+                    std::cout << "\n\nPresione Enter para continuar...";
+                    std::cin.get();
+                    std::cin.get();
                     break;
                 case 2:
                     std::cout << "Saliendo del programa...\n";
