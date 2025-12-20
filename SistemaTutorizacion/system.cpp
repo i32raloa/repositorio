@@ -188,14 +188,15 @@ void iniciarChat(const std::string& miId,const std::vector<Student>& students, c
 
     send(sock, miId.c_str(), miId.size(), 0);
 
-    if(!mostrarChatsDisponibles(miId, students, tutors)) {
-        std::cout << "\nNo hay chats disponibles para iniciar.\n";
+    auto chats = mostrarChatsDisponibles(miId, students, tutors); 
+    if(chats.empty()) {
+        std::cout << "No hay chats disponibles. Saliendo.\n";
         close(sock);
         return;
     }
 
     int numeroDest;
-    std::cout << "\nSeleccione el número del tutor/estudiante con el que quieres chatear: ";
+    std::cout << "\nSeleccione chat: ";
     std::cin >> numeroDest;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
@@ -304,68 +305,83 @@ std::vector<std::string> obtenerEstudiantesDelTutor(const std::string& idTutor, 
 }
 
 
-bool mostrarChatsDisponibles(const std::string& miId, const std::vector<Student>& students, const std::vector<Tutor>& tutors) {
-
-    bool esTutor = false;
-
-    for (const auto& t : tutors) {
-        if (t.getId() == miId) {
-            esTutor = true;
-            break;
-        }
-    }
+std::vector<std::string> mostrarChatsDisponibles(
+    const std::string& miId,
+    const std::vector<Student>& students,
+    const std::vector<Tutor>& tutors
+) {
+    std::vector<std::string> chats;
+    int index = 1;
 
     std::cout << "\n================= CHATS DISPONIBLES =================\n";
 
-    if (esTutor) {
+
+    if (miId[0] == 'T') {
         std::cout << "Rol: Tutor\n";
-        std::cout << "Estudiantes tutorizados:\n";
 
-        auto lista = obtenerEstudiantesDelTutor(miId, students);
-
-        if (lista.empty()) {
-            std::cout << "  (No tienes estudiantes asignados)\n";
-            return false;
-        } else {
-            for (const auto& id : lista) {
-                std::cout << "  - Estudiante ID: " << id << "\n";
+        for (const auto& s : students) {
+            if (s.getIdTutor() == miId) {
+                std::cout << index++ << ". Estudiante "
+                          << s.getId() << " - "
+                          << s.getNombre() << " "
+                          << s.getApellido() << "\n";
+                chats.push_back(s.getId());
             }
-            return true;
         }
-    } else {
-        std::cout << "Rol: Estudiante\n";
-        std::string idTutor = obtenerTutorDelEstudiante(miId, students);
+    }
 
-        if (idTutor == "0") {
-            std::cout << "  (No tienes tutor asignado)\n";
-            return false;
-        } else {
-            std::cout << "  Tutor asignado: ID " << idTutor << "\n";
+    else {
+        std::cout << "Rol: Estudiante\n";
+
+        for (const auto& s : students) {
+            if (s.getId() == miId && s.getIdTutor() != "0") {
+                for (const auto& t : tutors) {
+                    if (t.getId() == s.getIdTutor()) {
+                        std::cout << index++ << ". Tutor "
+                                  << t.getId() << " - "
+                                  << t.getNombre() << " "
+                                  << t.getApellido() << "\n";
+                        chats.push_back(t.getId());
+                    }
+                }
+            }
         }
-        return true;
+    }
+
+    if (chats.empty()) {
+        std::cout << "(No hay chats disponibles)\n";
     }
 
     std::cout << "====================================================\n";
+    return chats;
 }
 
 
-std::string formatearIdDestino(int numero, const std::vector<Student>& students, const std::vector<Tutor>& tutors, const std::string& miId) {
 
-    if(miId[0] == 'S') {
-        if(numero >= 1 && numero <= (int)tutors.size()) {
-            return tutors[numero-1].getId(); 
+std::string formatearIdDestino(int numero,
+                              const std::vector<Student>& students,
+                              const std::vector<Tutor>& tutors,
+                              const std::string& miId) {
+
+    if (miId[0] == 'S') {
+        for (const auto& s : students) {
+            if (s.getId() == miId) {
+                return s.getIdTutor(); 
+            }
         }
     }
 
-    else if(miId[0] == 'T') {
-
+    else if (miId[0] == 'T') {
         std::vector<Student> tutorizados;
-        for(const auto& s : students) {
-            if(s.getIdTutor() == miId) tutorizados.push_back(s);
+        for (const auto& s : students) {
+            if (s.getIdTutor() == miId) {
+                tutorizados.push_back(s);
+            }
         }
-        if(numero >= 1 && numero <= (int)tutorizados.size()) {
-            return tutorizados[numero-1].getId();
+        if (numero >= 1 && numero <= (int)tutorizados.size()) {
+            return tutorizados[numero - 1].getId();
         }
     }
+
     return "";
 }
