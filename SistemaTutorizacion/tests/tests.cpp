@@ -76,7 +76,7 @@ void testAsignacionManual() {
 
     ASSERT_EQUAL("T1", students[0].getIdTutor());
 
-    std::cin.rdbuf(orig); // restaurar std::cin
+    std::cin.rdbuf(orig); 
 }
 
 
@@ -90,10 +90,10 @@ void testFormatearIdDestino() {
     std::vector<Student> students = { s1, s2 };
     std::vector<Tutor> tutors = { t1 };
 
-    // Estudiante selecciona tutor
+
     ASSERT_EQUAL("T1", formatearIdDestino(1, students, tutors, "S1"));
 
-    // Tutor selecciona estudiante
+
     ASSERT_EQUAL("S1", formatearIdDestino(1, students, tutors, "T1"));
 }
 
