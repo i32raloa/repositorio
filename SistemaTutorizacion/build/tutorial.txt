@@ -1,1 +1,1 @@
-Hacer "cmake .." y luego "make" para compilar.
+Hacer "cmake .." y luego "make" para compilar, también ejecutar "./chat_server" para poder usar la funcionalidad del chat.
